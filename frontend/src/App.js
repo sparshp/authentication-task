@@ -1,28 +1,41 @@
-import React from 'react'
-import {
-  BrowserRouter,
-  Routes,
-  Route, Navigate 
-} from "react-router-dom";
-import HomePage from './pages/HomePage';
-import Login from './pages/Login';
-import Ragister from './pages/Ragister';
-import { useSelector } from "react-redux";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
+// Routing
+import PrivateRoute from "./components/routing/PrivateRoute";
 
+// Screens
+import PrivateScreen from "./components/screens/PrivateScreen";
+import LoginScreen from "./components/screens/LoginScreen";
+import RegisterScreen from "./components/screens/RegisterScreen";
+import ForgotPasswordScreen from "./components/screens/ForgotPasswordScreen";
+import ResetPasswordScreen from "./components/screens/ResetPasswordScreen";
+import SingleFile from "./components/screens/SingleFile";
+import EditFile from "./components/screens/EditFile";
 
 const App = () => {
-  const user = useSelector((state) => state.user.currentUser);
-  console.log(user)
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={user ? <Navigate to="/" replace/> : <Login/>}/>
-        <Route path="/ragister" element={user ? <Navigate to="/" replace /> : <Ragister />} />
-      </Routes>
-    </BrowserRouter>
-  )
-}
+    <Router>
+      <div className="app">
+        <Switch>
+          <PrivateRoute exact path="/" component={PrivateScreen} />
+          <Route exact path="/login" component={LoginScreen} />
+          <Route exact path="/register" component={RegisterScreen} />
+          <Route
+            exact
+            path="/forgotpassword"
+            component={ForgotPasswordScreen}
+          />
+          <Route
+            exact
+            path="/passwordreset/:resetToken"
+            component={ResetPasswordScreen}
+          />
+          <Route exact path="/file/:id" component={SingleFile} />
+          <Route exact path="/editfile/:id" component={EditFile} />
+        </Switch>
+      </div>
+    </Router>
+  );
+};
 
-export default App
+export default App;

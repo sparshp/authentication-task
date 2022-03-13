@@ -1,31 +1,30 @@
+require("dotenv").config({ path: "./.env" });
 const express = require("express");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const port = process.env.PORT || "8000";
+const connectDB = require("./config/db");
+const fileRoute = require("./routes/file");
+
+const errorHandler = require("./middleware/error");
 var cors = require('cors');
-const authRoute = require("./route/auth")
 
 
 const app = express();
-dotenv.config();
 
-app.use(cors({ origin: true, credentials: true }));
+connectDB();
 
-
-
-
-mongoose
-  .connect(
-    process.env.MONGO_URL
-  )
-  .then(() => console.log("db connecton successfull"))
-  .catch((err) => console.log(err));
-
-
-  //Routes
 app.use(express.json());
-app.use("/api/auth", authRoute)
+app.use(cors({ origin: true, credentials: true }));
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/private", require("./routes/private"));
+app.use("/api/file", fileRoute);
 
-app.listen(port, () => {
-  console.log("backend is running");
+// Error Handler Middleware
+app.use(errorHandler);
+
+const PORT = process.env.PORT || 5000;
+
+const server = app.listen(PORT, () => console.log(`listening on port ${PORT}`));
+
+process.on("unhandledRejection", (err, promise) => {
+  console.log(`Logged Error: ${err.message}`);
+  server.close(() => process.exit(1));
 });
